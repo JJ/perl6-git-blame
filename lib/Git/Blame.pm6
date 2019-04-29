@@ -1,17 +1,18 @@
 use v6.c;
 unit class Git::Blame:ver<0.0.1>;
 
-has @!lines;
+has @.lines;
+has @.chunks;
 
 multi method new( $file ) {
     
-    my @blame = qqx/git blame -e $file/;
+    my $blame = qqx/git blame -e $file/;
     my @lines;
     my @chunks;
     my $previous-sha1 = "";
     my Int $l = 1;
     my $chunk-range=1..1;
-    for @blame -> $line {
+    for $blame.split("\n") -> $line {
         $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/;
 
         my $sha1 = ~$<sha1>;
