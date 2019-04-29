@@ -13,6 +13,7 @@ multi method new( $file ) {
     my Int $l = 1;
     my $chunk-range=1..1;
     for $blame.split("\n") -> $line {
+        next if !$line;
         $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/;
 
         my $sha1 = ~$<sha1>;
