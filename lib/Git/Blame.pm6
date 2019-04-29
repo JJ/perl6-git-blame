@@ -7,17 +7,28 @@ multi method new( $file ) {
     
     my @blame = qqx/git blame -e $file/;
     my @lines;
+    my @chunks;
+    my $previous-sha1 = "";
+    my Int $l = 1;
+    my $chunk-range=1..1;
     for @blame -> $line {
-        CATCH {
-	    default {
-	        say "Error in $file and $line";
-	        say .backtrace;
-	    }
+        $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/;
+
+        my $sha1 = ~$<sha1>;
+        @lines.push: { sha1 => $sha1, email => ~$<email>, date => ~$<date> };
+        
+        # Process chunks
+        if $sha1 eq $previous-sha1 {
+            $chunk-range = ($chunk-range.min..$chunk-range.max+1);
+        } else {
+            @chunks.push: $chunk-range;
+            $chunk-range = $l..$l;
+            $previous-sha1 = $sha1;
         }
-        $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/; 
-        @lines.push: { sha1 => ~$<sha1>, email => ~$<email>, date => ~$<date> };
+
+        $l++;
     }
-    self.bless( :@lines );
+    self.bless( :@lines, :@chunks );
 }
 
 =begin pod
