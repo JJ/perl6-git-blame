@@ -1,8 +1,9 @@
 use v6.c;
 unit class Git::Blame:ver<0.0.1>;
 
+has @!lines;
 
-submethod new( $file ) {
+multi method new( $file ) {
     
     my @blame = qqx/git blame -e $file/;
     my @lines;
@@ -16,7 +17,7 @@ submethod new( $file ) {
         $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/; 
         @lines.push: { sha1 => ~$<sha1>, email => ~$<email>, date => ~$<date> };
     }
-    say @lines;
+    self.bless( :@lines );
 }
 
 =begin pod
