@@ -2,6 +2,6 @@ use v6.c;
 use Test;
 use Git::Blame;
 
-pass "replace me";
+my $git-blame = Git::Blame.new( "01-basic.t" );
 
 done-testing;

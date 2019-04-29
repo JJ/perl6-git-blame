@@ -2,11 +2,28 @@ use v6.c;
 unit class Git::Blame:ver<0.0.1>;
 
 
+submethod new( $file ) {
+    
+    my @blame = qqx/git blame -e $file/;
+    my @lines;
+    for @blame -> $line {
+        CATCH {
+	    default {
+	        say "Error in $file and $line";
+	        say .backtrace;
+	    }
+        }
+        $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/; 
+        @lines.push: { sha1 => ~$<sha1>, email => ~$<email>, date => ~$<date> };
+    }
+    say @lines;
+}
+
 =begin pod
 
 =head1 NAME
 
-Git::Blame - blah blah blah
+Git::Blame - Examine who's worked on a file
 
 =head1 SYNOPSIS
 
