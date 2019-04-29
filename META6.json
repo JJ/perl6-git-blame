@@ -1,0 +1,19 @@
+{
+  "authors" : [
+    "JJ Merelo"
+  ],
+  "build-depends" : [ ],
+  "depends" : [ ],
+  "description" : "blah blah blah",
+  "license" : "Artistic-2.0",
+  "name" : "Git::Blame",
+  "perl" : "6.c",
+  "provides" : {
+    "Git::Blame" : "lib/Git/Blame.pm6"
+  },
+  "resources" : [ ],
+  "source-url" : "",
+  "tags" : [ ],
+  "test-depends" : [ ],
+  "version" : "0.0.1"
+}
