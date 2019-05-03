@@ -72,7 +72,27 @@ for $git-blame.SHAs.keys -> $k {
 
 =head1 DESCRIPTION
 
-Git::Blame is ...
+Git::Blame is a module that uses C<git blame> to extract information from a single file in a repository and process it in a number of ways. It's mainly geared to tally contributions via lines changed, but it can also be modified and used to do some repository mining.
+
+																									     It works, for the time being, with single files.
+
+=head1 METHODS
+
+=head2 lines()
+
+Returns an Array with all the lines in the file
+
+=head2 chunks()
+
+Returns an array of hashes, every one of them with a chunk with range, author email and sha1 of the commit involved.
+
+=head2 SHAs()								      
+
+Returns a hash that uses as keys the sha1 of the commit, and as values arrays of all chunks changed in that commit
+
+=head2 author-lines()
+
+Returns a hash that uses the author emails as keys and the number of lines done in the current version as value.
 
 =head1 AUTHOR
 
