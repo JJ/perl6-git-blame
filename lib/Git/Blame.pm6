@@ -3,13 +3,14 @@ unit class Git::Blame:ver<0.0.1>;
 
 has @.lines;
 has @.chunks;
-has @.SHAs;
+has %.SHAs;
 
 multi method new( $file ) {
     
     my $blame = qqx/git blame -e $file/;
     my @lines;
     my @chunks;
+    my %SHAs;
     my $previous-sha1 = "";
     my Int $l = 1;
     my $chunk-range=1..1;
@@ -25,13 +26,14 @@ multi method new( $file ) {
             $chunk-range = ($chunk-range.min..$chunk-range.max+1);
         } else {
             @chunks.push: { range => $chunk-range, sha1 => $sha1, email =>  ~$<email>};
+	    %SHAs{$sha1}.push: { range => $chunk-range, email =>  ~$<email>};
             $chunk-range = $l..$l;
             $previous-sha1 = $sha1;
         }
 
         $l++;
     }
-    self.bless( :@lines, :@chunks );
+    self.bless( :@lines, :@chunks, :%SHAs );
 }
 
 =begin pod
