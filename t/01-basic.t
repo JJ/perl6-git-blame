@@ -11,12 +11,13 @@ my $lines = $git-blame.lines.elems;
 
 my $ranged-lines = 0;
 for $git-blame.chunks -> $c {
-    say $c<range>;
     $ranged-lines += $c<range>.elems;
 }
 is( $lines, $ranged-lines, "All lines accounted for");
 isa-ok $git-blame.lines[0]<sha1>, Str, "There's a correct sha1 here";
 ok( $git-blame.SHAs(), "SHAs categorized" );
 cmp-ok $git-blame.SHAs.keys.elems, ">=", 1, "More than 1 commit";
+
+isa-ok $git-blame.author-lines, Hash, "Author lines is a hash";
 
 done-testing;

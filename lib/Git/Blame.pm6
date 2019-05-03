@@ -17,7 +17,6 @@ multi method new( $file ) {
     @blame-lines.pop; # Last line off
     loop ( my $l = 0; $l <  @blame-lines.elems; $l++ ) {
 	my $line = @blame-lines[$l];
-	say "$l, $line";
         $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/;
 
         my $sha1 = ~$<sha1>;
@@ -38,6 +37,15 @@ multi method new( $file ) {
     }
     self.bless( :@lines, :@chunks, :%SHAs );
 }
+
+method author-lines() {
+    my %author-lines;
+    for @!chunks -> $c {
+	%author-lines{$c<email>} += $c<range>.elems;
+    }
+    return %author-lines;
+}
+
 
 =begin pod
 
