@@ -12,26 +12,29 @@ multi method new( $file ) {
     my @chunks;
     my %SHAs;
     my $previous-sha1 = "";
-    my Int $l = 1;
     my $chunk-range=1..1;
-    for $blame.split("\n") -> $line {
-        next if !$line;
+    my @blame-lines = $blame.split("\n");
+    @blame-lines.pop; # Last line off
+    loop ( my $l = 0; $l <  @blame-lines.elems; $l++ ) {
+	my $line = @blame-lines[$l];
+	say "$l, $line";
         $line ~~ /$<sha1>=[ \w+ ] \s+ "(<" $<email> = [ .+? ] ">" \s+ $<date>=[ \S+ \s+ \S+ \s+ \S+ ]/;
 
         my $sha1 = ~$<sha1>;
         @lines.push: { sha1 => $sha1, email => ~$<email>, date => ~$<date> };
         
         # Process chunks
-        if $sha1 eq $previous-sha1 {
+        if  $sha1 eq $previous-sha1  {
             $chunk-range = ($chunk-range.min..$chunk-range.max+1);
-        } else {
+        } elsif $previous-sha1 ne "" {
             @chunks.push: { range => $chunk-range, sha1 => $sha1, email =>  ~$<email>};
 	    %SHAs{$sha1}.push: { range => $chunk-range, email =>  ~$<email>};
-            $chunk-range = $l..$l;
-            $previous-sha1 = $sha1;
+            $chunk-range = ($l+1)..($l+1);
         }
-
-        $l++;
+	$previous-sha1 = $sha1;
+	if ( $l == @blame-lines.elems -1 ) {
+	    @chunks.push: { range => $chunk-range, sha1 => $sha1, email =>  ~$<email>};
+	}
     }
     self.bless( :@lines, :@chunks, :%SHAs );
 }
@@ -47,6 +50,15 @@ Git::Blame - Examine who's worked on a file
 =begin code :lang<perl6>
 
 use Git::Blame;
+
+my $blamer = Git::Blame.new( "t/01-basic.t" );
+say "Lines ",  $git-blame.lines();
+say "Chunks ", $git-blame.chunks();
+for $git-blame.SHAs.keys -> $k {
+    say $git-blame.SHAs{$k}<email>, " → ",  $git-blame.SHAs{$k}<range>;
+}
+
+
 
 =end code
 
