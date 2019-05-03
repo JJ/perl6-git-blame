@@ -3,6 +3,7 @@ unit class Git::Blame:ver<0.0.1>;
 
 has @.lines;
 has @.chunks;
+has @.SHAs;
 
 multi method new( $file ) {
     
@@ -23,7 +24,7 @@ multi method new( $file ) {
         if $sha1 eq $previous-sha1 {
             $chunk-range = ($chunk-range.min..$chunk-range.max+1);
         } else {
-            @chunks.push: $chunk-range;
+            @chunks.push: { range => $chunk-range, sha1 => $sha1, email =>  ~$<email>};
             $chunk-range = $l..$l;
             $previous-sha1 = $sha1;
         }
